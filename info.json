@@ -1,0 +1,9 @@
+{
+  "name": "factorio-agent-api",
+  "version": "1.0.0",
+  "title": "Factorio Agent API",
+  "author": "Human",
+  "factorio_version": "2.0",
+  "description": "Provides an API for programmatic control of Factorio via file-based commands and game state output.",
+  "dependencies": ["base >= 2.0"]
+}
