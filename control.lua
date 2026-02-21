@@ -70,6 +70,17 @@ local function get_player()
     return game.get_player(1)
 end
 
+-- Safely read a field from a Factorio LuaObject; returns default when the key doesn't exist.
+local function get_field(obj, key, default)
+    local ok, val = pcall(function() return obj[key] end)
+    return ok and val or default
+end
+
+-- Helper: Get crafting queue size (or 0 when there is no crafting queue, which throws an error)
+local function get_crafting_queue_size(player)
+    return get_field(player, "crafting_queue_size", 0)
+end
+
 -- Helper: Add response
 local function add_response(cmd_id, status, message, data)
     table.insert(agent_state.pending_responses, {
@@ -740,11 +751,11 @@ function cmd_handlers.status(args)
             y = math.floor(character.position.y * 10) / 10
         } or nil,
         health = character and character.health or 0,
-        max_health = character and character.prototype.max_health or 0,
+        max_health = character and get_field(character.prototype, "max_health", 0) or 0,
         mining = agent_state.mining_target ~= nil,
         walking = agent_state.walking_direction ~= nil,
         walking_direction = agent_state.walking_direction,
-        crafting_queue_size = player.crafting_queue_size,
+        crafting_queue_size = get_crafting_queue_size(player),
         game_tick = game.tick,
         daytime = player.surface.daytime,
         pollution = character and player.surface.get_pollution(character.position) or 0
@@ -923,11 +934,11 @@ local function write_game_state()
                 y = math.floor(character.position.y * 100) / 100
             } or nil,
             health = character and character.health or 0,
-            max_health = character and character.prototype.max_health or 0,
+            max_health = character and get_field(character.prototype, "max_health", 0) or 0,
             walking = agent_state.walking_direction,
             mining = agent_state.mining_target ~= nil
         },
-        crafting_queue_size = player.crafting_queue_size,
+        crafting_queue_size = get_crafting_queue_size(player),
         research = player.force.current_research and {
             name = player.force.current_research.name,
             progress = player.force.research_progress
